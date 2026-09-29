@@ -1,0 +1,45 @@
+name: Test formula
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      formula-artifact:
+        description: "Artifact holding a candidate roc.rb to test instead of the checked-in Formula/roc.rb."
+        type: string
+        default: ""
+
+# Do not add permissions here! Configure them at the job level!
+permissions: {}
+
+jobs:
+  test:
+    name: brew install and test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, macos-26-intel, ubuntu-26.04, ubuntu-26.04-arm]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+
+    steps:
+      # Taps this repo as roc-lang/roc and makes the workspace that tap's checkout.
+      - uses: Homebrew/actions/setup-homebrew@848c272c7bfe984a197bd4d16383f4c106ec61e6 # ratchet:Homebrew/actions/setup-homebrew@main
+
+      - name: Use candidate formula
+        if: inputs.formula-artifact != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # ratchet:actions/download-artifact@v8.0.1
+        with:
+          name: ${{ inputs.formula-artifact }}
+          path: Formula
+
+      # Includes `brew style`.
+      - run: brew audit --strict --online roc-lang/roc/roc
+
+      - run: brew install --verbose roc-lang/roc/roc
+
+      - run: brew test --verbose roc-lang/roc/roc

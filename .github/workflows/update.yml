@@ -1,0 +1,104 @@
+name: Update formula to latest nightly
+
+on:
+  schedule:
+    # roc-lang/nightlies publishes anywhere from ~12:00 to ~22:00 UTC; runs with nothing new are cheap no-ops.
+    - cron: "15 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Nightly to pin, e.g. nightly-2026-09-23-c7852fd. Empty means the latest."
+        type: string
+        default: ""
+
+# Do not add permissions here! Configure them at the job level!
+permissions: {}
+
+concurrency:
+  group: update-formula
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    name: Point formula at nightly
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.bump.outputs.changed }}
+      version: ${{ steps.bump.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # ratchet:actions/checkout@v7.0.1
+
+      - name: Update Formula/roc.rb
+        id: bump
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          ./scripts/update-formula.sh ${TAG:+"$TAG"}
+          git diff
+          if git diff --quiet -- Formula/roc.rb; then changed=false; else changed=true; fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          echo "version=$(sed -nE 's/^  version "(.*)"$/\1/p' Formula/roc.rb)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload candidate formula
+        if: steps.bump.outputs.changed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # ratchet:actions/upload-artifact@v7.0.1
+        with:
+          name: roc-formula
+          path: Formula/roc.rb
+          retention-days: 7
+
+  # The formula only moves to a nightly that installs and passes `brew test` on every platform.
+  test:
+    name: Test candidate formula
+    needs: bump
+    if: needs.bump.outputs.changed == 'true'
+    uses: ./.github/workflows/tests.yml
+    permissions:
+      contents: read
+    with:
+      formula-artifact: roc-formula
+
+  commit:
+    name: Commit formula
+    needs: [bump, test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # ratchet:actions/download-artifact@v8.0.1
+        with:
+          name: roc-formula
+          path: Formula
+
+      # createCommitOnBranch has GitHub sign the commit, and expectedHeadOid makes it fail
+      # rather than overwrite anything that landed on the branch while this run was testing.
+      - name: Commit via GitHub API
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.bump.outputs.version }}
+          BRANCH: ${{ github.ref_name }}
+          HEAD_OID: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          jq -n \
+            --arg repo "$GITHUB_REPOSITORY" \
+            --arg branch "$BRANCH" \
+            --arg oid "$HEAD_OID" \
+            --arg msg "roc $VERSION" \
+            --arg contents "$(base64 -w0 Formula/roc.rb)" \
+            '{
+              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid url } } }",
+              variables: {input: {
+                branch: {repositoryNameWithOwner: $repo, branchName: $branch},
+                message: {headline: $msg},
+                expectedHeadOid: $oid,
+                fileChanges: {additions: [{path: "Formula/roc.rb", contents: $contents}]}
+              }}
+            }' > commit-payload.json
+          gh api graphql --input commit-payload.json
