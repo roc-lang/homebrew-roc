@@ -3,7 +3,7 @@
 class Roc < Formula
   desc "Fast, friendly, functional programming language"
   homepage "https://www.roc-lang.org"
-  version "2026-10-04-130536d"
+  version "2026-10-06-c34079d"
   license "UPL-1.0"
 
   on_macos do
@@ -11,23 +11,23 @@ class Roc < Formula
     depends_on macos: :sequoia
 
     on_arm do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-04-130536d/roc_nightly-macos_apple_silicon-2026-10-04-130536d.tar.gz"
-      sha256 "e0147f62f072a309519cbc2a6ebfa11e4bb8bac7903d5febaf7a112d1fc2842f"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-06-c34079d/roc_nightly-macos_apple_silicon-2026-10-06-c34079d.tar.gz"
+      sha256 "78ef3fc25161d908321d2dae2b9053bc03a1e946f8528d78aec594c2f401a5ed"
     end
     on_intel do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-04-130536d/roc_nightly-macos_x86_64-2026-10-04-130536d.tar.gz"
-      sha256 "cd8df0772cc1d831acea9ebe000340d244297e37393e4d0a8b581f8300422fd4"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-06-c34079d/roc_nightly-macos_x86_64-2026-10-06-c34079d.tar.gz"
+      sha256 "7a04bab76328e90363fffe174c275debc8c9d964f2940ac74edd48478d0c6229"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-04-130536d/roc_nightly-linux_arm64-2026-10-04-130536d.tar.gz"
-      sha256 "f4532d290c83920d23f191da4650b19aa8302743ed35cab4e9adc83beaf0c1db"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-06-c34079d/roc_nightly-linux_arm64-2026-10-06-c34079d.tar.gz"
+      sha256 "1efdc8c4dbb813cff10254a13d75822162a7dde8cfc93afa93c2c2b545ce02d4"
     end
     on_intel do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-04-130536d/roc_nightly-linux_x86_64-2026-10-04-130536d.tar.gz"
-      sha256 "893c86d2da0a4c390cbdbd4258ce45d686e5ec15b42eeeb811fd1ac44537714f"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-06-c34079d/roc_nightly-linux_x86_64-2026-10-06-c34079d.tar.gz"
+      sha256 "11bf5c73b81e517ae2807f4211fe9e996f48f87a68b1e85b82c4ae2c6499a5d6"
     end
   end
 
