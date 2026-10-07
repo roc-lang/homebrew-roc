@@ -1,15 +1,10 @@
-name: Update formula to latest nightly
+name: Sync formula with install_roc.sh
 
 on:
   schedule:
-    # roc-lang/nightlies publishes anywhere from ~12:00 to ~22:00 UTC; runs with nothing new are cheap no-ops.
+    # install_roc.sh changes rarely; runs with nothing new are cheap no-ops.
     - cron: "15 */3 * * *"
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Nightly to pin, e.g. nightly-2026-09-23-c7852fd. Empty means the latest."
-        type: string
-        default: ""
 
 # Do not add permissions here! Configure them at the job level!
 permissions: {}
@@ -20,7 +15,7 @@ concurrency:
 
 jobs:
   bump:
-    name: Point formula at nightly
+    name: Sync formula
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -35,10 +30,9 @@ jobs:
         id: bump
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
-          ./scripts/update-formula.sh ${TAG:+"$TAG"}
+          ./scripts/update-formula.sh
           git diff
           if git diff --quiet -- Formula/roc.rb; then changed=false; else changed=true; fi
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
@@ -52,7 +46,7 @@ jobs:
           path: Formula/roc.rb
           retention-days: 7
 
-  # The formula only moves to a nightly that installs and passes `brew test` on every platform.
+  # The formula only moves to a release that installs and passes `brew test` (the examples CI script) on every platform.
   test:
     name: Test candidate formula
     needs: bump

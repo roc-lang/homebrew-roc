@@ -23,6 +23,7 @@ jobs:
       matrix:
         os: [macos-26, macos-26-intel, ubuntu-26.04, ubuntu-26.04-arm]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     permissions:
       contents: read
 

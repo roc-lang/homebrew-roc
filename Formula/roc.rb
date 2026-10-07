@@ -1,34 +1,43 @@
 # Interim formula: installs prebuilt binaries from roc-lang/nightlies until Roc has
-# a stable release that can go to homebrew-core. Bumped by .github/workflows/update.yml.
+# a stable release that can go to homebrew-core. Kept in sync with the release in
+# roc-lang.org's install_roc.sh by .github/workflows/update.yml.
 class Roc < Formula
   desc "Fast, friendly, functional programming language"
   homepage "https://www.roc-lang.org"
-  version "2026-10-06-c34079d"
+  version "2026-09-18-1d982dc"
   license "UPL-1.0"
+
+  uses_from_macos "expect" => :test
 
   on_macos do
     # macOS 15 is the oldest version Roc is tested on.
     depends_on macos: :sequoia
 
     on_arm do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-06-c34079d/roc_nightly-macos_apple_silicon-2026-10-06-c34079d.tar.gz"
-      sha256 "78ef3fc25161d908321d2dae2b9053bc03a1e946f8528d78aec594c2f401a5ed"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-09-18-1d982dc/roc_nightly-macos_apple_silicon-2026-09-18-1d982dc.tar.gz"
+      sha256 "3e27f5020ab8ef848b6facf5ed213c464795695f589f3341263823944cfe4cff"
     end
     on_intel do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-06-c34079d/roc_nightly-macos_x86_64-2026-10-06-c34079d.tar.gz"
-      sha256 "7a04bab76328e90363fffe174c275debc8c9d964f2940ac74edd48478d0c6229"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-09-18-1d982dc/roc_nightly-macos_x86_64-2026-09-18-1d982dc.tar.gz"
+      sha256 "6479edcf15cae24c31242f32477dbfff17fbee836927e0f6128eeb3993286495"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-06-c34079d/roc_nightly-linux_arm64-2026-10-06-c34079d.tar.gz"
-      sha256 "1efdc8c4dbb813cff10254a13d75822162a7dde8cfc93afa93c2c2b545ce02d4"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-09-18-1d982dc/roc_nightly-linux_arm64-2026-09-18-1d982dc.tar.gz"
+      sha256 "bd0f35d221031e289fafa0a1f24d39e18e6524c70d8b1ab926949b636bf51151"
     end
     on_intel do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-06-c34079d/roc_nightly-linux_x86_64-2026-10-06-c34079d.tar.gz"
-      sha256 "11bf5c73b81e517ae2807f4211fe9e996f48f87a68b1e85b82c4ae2c6499a5d6"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-09-18-1d982dc/roc_nightly-linux_x86_64-2026-09-18-1d982dc.tar.gz"
+      sha256 "503e6e573495674ddfe57e3db5390c403afa3764a7bb2b87c567f391beda5df5"
     end
+  end
+
+  # The examples revision that roc-lang.org's examples.json pins; `brew test` runs its CI script.
+  resource "examples" do
+    url "https://github.com/roc-lang/examples/archive/c176d73044107111d8cd931839b7a3659f924736.tar.gz"
+    sha256 "f12a17a9a243a87ff83aa6ae8cacebd12dd66aff178c34d6aabfc2c90feeb8fa"
   end
 
   def install
@@ -42,14 +51,8 @@ class Roc < Formula
   test do
     assert_equal "Roc compiler version nightly-#{version}", shell_output("#{bin}/roc version").strip
 
-    # Headerless apps use the built-in Echo platform, so this needs no network.
-    (testpath/"hello.roc").write <<~ROC
-      main! = |_args| {
-          echo!("Hello, World!")
-          Ok({})
-      }
-    ROC
-    system bin/"roc", "build", "hello.roc"
-    assert_equal "Hello, World!", shell_output("./hello").strip
+    resource("examples").stage testpath
+    ENV["ROC"] = bin/"roc"
+    system "bash", "ci_scripts/all_tests.sh"
   end
 end
