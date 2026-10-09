@@ -23,6 +23,7 @@ jobs:
       matrix:
         os: [macos-26, macos-26-intel, ubuntu-26.04, ubuntu-26.04-arm]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     permissions:
       contents: read
 
@@ -40,6 +41,7 @@ jobs:
       # Includes `brew style`.
       - run: brew audit --strict --online roc-lang/roc/roc
 
-      - run: brew install --verbose roc-lang/roc/roc
+      # --include-test installs the formula's test dependencies (expect), which `brew test` requires.
+      - run: brew install --verbose --include-test roc-lang/roc/roc
 
       - run: brew test --verbose roc-lang/roc/roc
