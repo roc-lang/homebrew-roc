@@ -37,8 +37,8 @@ class Roc < Formula
   # The examples revision that roc-lang.org's examples.json pins; `brew test` runs its CI script
   # on the examples that pin this formula's Roc version.
   resource "examples" do
-    url "https://github.com/roc-lang/examples/archive/bb2ffdf9b78abd000c159b7b477c5d12842dfb42.tar.gz"
-    sha256 "4f4e28afeacc50a1b6bd6b795a9cd634c8d4dd4daf5395b469a7eafa31815a3e"
+    url "https://github.com/roc-lang/examples/archive/d1ed73a5dde9415421d1d55b5d1bf41136db977a.tar.gz"
+    sha256 "281256700589735bba8aa4f486a58a37b75aed007504193946dff8ee21bd062b"
   end
 
   def install
