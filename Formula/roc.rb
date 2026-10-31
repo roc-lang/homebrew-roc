@@ -4,7 +4,7 @@
 class Roc < Formula
   desc "Fast, friendly, functional programming language"
   homepage "https://www.roc-lang.org"
-  version "2026-10-29-a0a9fc2"
+  version "2026-10-30-0602c5f"
   license "UPL-1.0"
 
   uses_from_macos "expect" => :test
@@ -14,31 +14,31 @@ class Roc < Formula
     depends_on macos: :sequoia
 
     on_arm do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-29-a0a9fc2/roc_nightly-macos_apple_silicon-2026-10-29-a0a9fc2.tar.gz"
-      sha256 "4c25207e3c1d8db80b23c27ca873431fa6d279670a96614dd0db3483ff2ef65c"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-30-0602c5f/roc_nightly-macos_apple_silicon-2026-10-30-0602c5f.tar.gz"
+      sha256 "ad3495f38b261146c187eca87889e3881260557de14d483367831f0ee542bcc9"
     end
     on_intel do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-29-a0a9fc2/roc_nightly-macos_x86_64-2026-10-29-a0a9fc2.tar.gz"
-      sha256 "928a8ee347b19c320f70a3434dd341487869a9e73a8e8a0c87ec3da37a57e991"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-30-0602c5f/roc_nightly-macos_x86_64-2026-10-30-0602c5f.tar.gz"
+      sha256 "8cdd0aac3484c6c6a2500e768bcd19be624b9f0bbebaff6ab117ebff485ea2b3"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-29-a0a9fc2/roc_nightly-linux_arm64-2026-10-29-a0a9fc2.tar.gz"
-      sha256 "2d4c11cc5d258325f5f3424513dc5fa944bcee6bc7a4d3b78889e4dbacc4b268"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-30-0602c5f/roc_nightly-linux_arm64-2026-10-30-0602c5f.tar.gz"
+      sha256 "5d4385c99dc4463ae1a5f355912956040108fce4397c24afb3fa62390d746da9"
     end
     on_intel do
-      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-29-a0a9fc2/roc_nightly-linux_x86_64-2026-10-29-a0a9fc2.tar.gz"
-      sha256 "149022295109108d4bb373e6bf6c38affdcd3b6be2f22deae05aec15381e47f4"
+      url "https://github.com/roc-lang/nightlies/releases/download/nightly-2026-10-30-0602c5f/roc_nightly-linux_x86_64-2026-10-30-0602c5f.tar.gz"
+      sha256 "e67256aeac4eedd99568802ec187d155e54594e40fb475f7b73005c74410c708"
     end
   end
 
   # The examples revision that roc-lang.org's examples.json pins; `brew test` runs its CI script
   # on the examples that pin this formula's Roc version.
   resource "examples" do
-    url "https://github.com/roc-lang/examples/archive/baa8add8cc5bdf8d86f4dcf93926a4043da3eb48.tar.gz"
-    sha256 "1d5518789ad180a40e22f0053449572e23fa8ef65ebbcfc8389cada59fe1fa7b"
+    url "https://github.com/roc-lang/examples/archive/e252bf93098eadb2e8c0b99fa1efc08b3b0caae2.tar.gz"
+    sha256 "c1e85f0dea5876f47d075e1e9f1b24d4257ed85d8bf6f6504236dbfcd76531fc"
   end
 
   def install
