@@ -15,23 +15,23 @@ class Roc < Formula
     depends_on macos: :sequoia
 
     on_arm do
-      url "https://github.com/roc-lang/roc/releases/download/0.1.0_RC1/roc-macos_apple_silicon-0.1.0_RC1.tar.gz"
-      sha256 "e8228040c701e130254c72539a1d0f1b150d78c00058747edb0edae51ba5dbc8"
+      url "https://github.com/roc-lang/roc/releases/download/0.1.0/roc-macos_apple_silicon-0.1.0.tar.gz"
+      sha256 "6143ed7eb2b5bebaefa6c4b48f97dede0e97644d4fde076b6258076cbecfc504"
     end
     on_intel do
-      url "https://github.com/roc-lang/roc/releases/download/0.1.0_RC1/roc-macos_x86_64-0.1.0_RC1.tar.gz"
-      sha256 "ea9b38b5e4708cbe42c92077e816f5241299da1aa3f4c46e8cb933b1aa2af858"
+      url "https://github.com/roc-lang/roc/releases/download/0.1.0/roc-macos_x86_64-0.1.0.tar.gz"
+      sha256 "12ac24a0eea147134d74b060746388e7f1981db996c2fbeb47c21f2fafd9ca45"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/roc-lang/roc/releases/download/0.1.0_RC1/roc-linux_arm64-0.1.0_RC1.tar.gz"
-      sha256 "b3e0a9dbc922f3802702a55a1869ad2c2e4f4dc935d8a9d1b26c3612668dff43"
+      url "https://github.com/roc-lang/roc/releases/download/0.1.0/roc-linux_arm64-0.1.0.tar.gz"
+      sha256 "635c38a0128fdc77cfe4f225ecd2e213e24f04fe65e3ccbafea5ca20e041d01f"
     end
     on_intel do
-      url "https://github.com/roc-lang/roc/releases/download/0.1.0_RC1/roc-linux_x86_64-0.1.0_RC1.tar.gz"
-      sha256 "043c426ea85dcdbd427951eaed246f0c10c171d988f2598782233a6dae43379d"
+      url "https://github.com/roc-lang/roc/releases/download/0.1.0/roc-linux_x86_64-0.1.0.tar.gz"
+      sha256 "40f3e43f762dbf18597201739a6f645badcd05edbf9ea353805c5453a9336cfd"
     end
   end
 
@@ -56,7 +56,11 @@ class Roc < Formula
     resource("examples").stage testpath
     # Each example pins its Roc version in its header; only those pinning this release must pass with it.
     # Headers spell the release 0.1.0_RC1 as 0.1.0-RC1.
-    pin = "roc: \"#{version.to_s.tr("_", "-")}\""
+    release = version.to_s.tr("_", "-")
+    pin = "roc: \"#{release}\""
+    # Examples can lag behind a release, so pins of its release candidates count as pinning it.
+    roc_files = (testpath/"examples").glob("**/*.roc")
+    inreplace roc_files, /roc: "#{Regexp.escape(release)}[-_]RC\d+"/, pin, audit_result: false
     examples = (testpath/"examples").children.select do |dir|
       dir.glob("**/*.roc").any? { |file| file.read.include?(pin) }
     end

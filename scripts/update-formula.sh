@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Syncs Formula/roc.rb with the Roc release pinned in the website's install_roc.sh, and with the
 # roc-lang/examples revision pinned in the website's examples.json (used by the formula's test) if its
-# examples pin that release.
+# examples pin that release or one of its release candidates.
 # Usage: scripts/update-formula.sh [website-ref]   (default: main; needs gh and curl)
 set -euo pipefail
 
@@ -65,9 +65,10 @@ if [ "$new_rev" != "$old_rev" ]; then
   archive="$tmp/examples.tar.gz"
   curl --proto '=https' --tlsv1.2 -fsSL -o "$archive" "https://github.com/$EXAMPLES_REPO/archive/$new_rev.tar.gz"
   tar -xzf "$archive" -C "$tmp"
-  # examples.json can lag behind install_roc.sh, and the test needs examples that pin this release.
-  # Headers spell the release 0.1.0_RC1 as 0.1.0-RC1.
-  if grep -rqF --include='*.roc' "roc: \"${new_version//_/-}\"" "$tmp"; then
+  # examples.json can lag behind install_roc.sh, and the test needs examples that pin this release or
+  # one of its release candidates. Headers spell the release 0.1.0_RC1 as 0.1.0-RC1.
+  release="${new_version//_/-}"
+  if grep -rqE --include='*.roc' "roc: \"${release//./\\.}([-_]RC[0-9]+)?\"" "$tmp"; then
     examples_sha="$(shasum -a 256 "$archive" | awk '{print $1}')"
     OLD="$old_rev" NEW="$new_rev" SHA="$examples_sha" \
       perl -0777 -pi -e 's/\Q$ENV{OLD}\E(\.tar\.gz"\n\s*sha256 ")[0-9a-f]{64}/$ENV{NEW}$1$ENV{SHA}/ or die "examples resource not found\n"' "$FORMULA"

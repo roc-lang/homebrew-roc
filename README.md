@@ -13,8 +13,9 @@ This tap is an interim solution until Roc has a stable release that can go into 
 ## How the formula is updated
 
 [update.yml](.github/workflows/update.yml) checks every three hours whether `install_roc.sh` points at a different release, and syncs `Formula/roc.rb` with it (version and checksums).
-It also takes the [roc-lang/examples](https://github.com/roc-lang/examples) revision from the website's [examples.json](https://github.com/roc-lang/www.roc-lang.org/blob/main/website/examples.json), unless none of its examples pin the new release.
-`brew test` runs that revision's `ci_scripts/all_tests.sh` against the installed `roc` (needs network).
+It also takes the [roc-lang/examples](https://github.com/roc-lang/examples) revision from the website's [examples.json](https://github.com/roc-lang/www.roc-lang.org/blob/main/website/examples.json), unless none of its examples pin the new release or one of its release candidates.
+`brew test` runs that revision's `ci_scripts/all_tests.sh` against the installed `roc` (needs network), on the examples that pin the formula's release.
+Pins of that release's release candidates are first rewritten to the release, since examples can lag behind it.
 It leaves out ElmWebApp, which needs Firefox, and Firefox cannot start in Homebrew's macOS test sandbox.
 The new version is only committed once `brew install` and `brew test` pass on all four platforms.
 
